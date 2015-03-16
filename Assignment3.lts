@@ -1,0 +1,35 @@
+const QSIZE = 10
+range QRANGE = 0..QSIZE
+range CPUTRANGE = 0..10
+
+//QUEUE = QUEUE[0],
+//QUEUE[p:QRANGE] = (when (p<QSIZE) enqueue[t:CPUTRANGE] -> QUEUE[p+1]|
+//    when (p>0) dequeue[t:CPUTRANGE] -> QUEUE[p-1]
+//  ).
+
+//QUEUE(N=5) = QUEUE[0],
+//QUEUE[i:0..N]
+//      = (when (i<N) enqueue->QUEUE[i+1]
+//       |when (i>0) dequeue->QUEUE[i-1]
+//       ).
+
+GENERATOR = (create[t:CPUTRANGE] -> enqueue -> GENERATOR).
+
+range T = 0..10
+QUEUE = (in[i:T]->out[i]->QUEUE).
+||TWOBUF = ({a,b,c}:QUEUE)
+	   /{in/a.in,
+	     a.out/b.in,
+	     out/b.out}
+		@{in,out}.
+
+menu RUN = {in[T],out[T]}
+
+CPU = CPU[0],
+CPU[t : CPUTRANGE] = (when (t>0) tick -> CPU[t-1]|
+     when (t==0) start[i:CPUTRANGE] -> CPU[i]
+   ).
+
+//GRIMREAPER = (start[i:CPUTRANGE] -> dequeue[i] -> GRIMREAPER).
+
+||RR_SCHEDULER = (CPU || TWOBUF)/{start[i:CPUTRANGE]/out[i]}.
