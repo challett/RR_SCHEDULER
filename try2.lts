@@ -1,18 +1,20 @@
-const Max = 2
-range Int = 0..Max
-const Pmax = 10
-range Prange = 0..Pmax
+const MaxIF=4
+range IF=0..MaxIF
+set Waiters={lucy, bob, alice, jill}
+ARRIVE=ARRIVE[0],
+ARRIVE[num:IF]=(enterarrq[num]->ARRIVE[(num+1)%MaxIF]).
+ARRIVALQ=(enterarrq[num:IF]->ARRIVALQ[num]),
+ARRIVALQ[n0:IF]=(enterarrq[num:IF]->ARRIVALQ[n0][num]
+	|Waiters.order[n0]->ARRIVALQ),
+ARRIVALQ[n0:IF][n1:IF]=(
+	enterarrq[num:IF]->ARRIVALQ[n0][n1][num]
+	|Waiters.order[n0]->ARRIVALQ[n1]),
+ARRIVALQ[n0:IF][n1:IF][n2:IF]=(
+	enterarrq[num:IF]->ARRIVALQ[n0][n1][n2][num]
+	|Waiters.order[n0]->ARRIVALQ[n1][n2]),
+ARRIVALQ[n0:IF][n1:IF][n2:IF][n3:IF]=(
+	Waiters.order[n0]->ARRIVALQ[n1][n2][n3]).
 
-SEMAPHORE(I=0) = SEMA[I],
-SEMA[v:Int] = (when(v<Max) put[i:Prange]->SEMA[v+1]
-                 |when(v>0) get[i:Prange]->SEMA[v-1]).
+Waiter = (order[c:IF] -> serve [c] -> pay[c] ->Waiter).
 
-QUEUEDATA = (put[i:Prange] -> get[i] -> QUEUEDATA).
-
-PRODUCER =(put[i:Prange]->PRODUCER).
-
-CONSUMER =(get[i:Prange]->CONSUMER).
-
-||BOUNDEDBUFFER = ({q1,q2}::PRODUCER || {q1,q2}::CONSUMER
-                  ||{q1,q2}::SEMAPHORE(0) || {q1,q2}:QUEUEDATA)
-		  @{put,get}.
+||McDonalds=(Waiters:Waiter|| ARRIVE || ARRIVALQ).
