@@ -1,20 +1,25 @@
 const MaxIF=4
 range IF=0..MaxIF
-set Waiters={lucy, bob, alice, jill}
-ARRIVE=ARRIVE[0],
-ARRIVE[num:IF]=(enterarrq[num]->ARRIVE[(num+1)%MaxIF]).
-ARRIVALQ=(enterarrq[num:IF]->ARRIVALQ[num]),
-ARRIVALQ[n0:IF]=(enterarrq[num:IF]->ARRIVALQ[n0][num]
-	|Waiters.order[n0]->ARRIVALQ),
-ARRIVALQ[n0:IF][n1:IF]=(
-	enterarrq[num:IF]->ARRIVALQ[n0][n1][num]
-	|Waiters.order[n0]->ARRIVALQ[n1]),
-ARRIVALQ[n0:IF][n1:IF][n2:IF]=(
-	enterarrq[num:IF]->ARRIVALQ[n0][n1][n2][num]
-	|Waiters.order[n0]->ARRIVALQ[n1][n2]),
-ARRIVALQ[n0:IF][n1:IF][n2:IF][n3:IF]=(
-	Waiters.order[n0]->ARRIVALQ[n1][n2][n3]).
 
-Waiter = (order[c:IF] -> serve [c] -> pay[c] ->Waiter).
+GENERATOR=GENERATOR[0],
+GENERATOR[num:IF]=(enterarrq[num]->GENERATOR[(num+1)%MaxIF]).
 
-||McDonalds=(Waiters:Waiter|| ARRIVE || ARRIVALQ).
+QUEUE=(enterarrq[num:IF]->QUEUE[num]),
+
+QUEUE[n0:IF]=(enterarrq[num:IF]->QUEUE[n0][num]
+	|cpu.order[n0]->QUEUE),
+
+QUEUE[n0:IF][n1:IF]=(
+	enterarrq[num:IF]->QUEUE[n0][n1][num]
+	|cpu.order[n0]->QUEUE[n1]),
+
+QUEUE[n0:IF][n1:IF][n2:IF]=(
+	enterarrq[num:IF]->QUEUE[n0][n1][n2][num]
+	|cpu.order[n0]->QUEUE[n1][n2]),
+
+QUEUE[n0:IF][n1:IF][n2:IF][n3:IF]=(
+	cpu.order[n0]->QUEUE[n1][n2][n3]).
+
+CPU = (order[c:IF] -> serve[c] -> pay[c] ->CPU).
+
+||RR_SCHEDULER=(cpu:CPU|| GENERATOR || QUEUE).
