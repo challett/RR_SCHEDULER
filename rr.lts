@@ -1,0 +1,35 @@
+const MaxIF=6
+range IF=0..MaxIF-1
+const MaxCPU=5
+range CPUT = 0..MaxCPU
+
+GENERATOR=GENERATOR[0],
+GENERATOR[num:IF]=(enterarrq[num]->GENERATOR[(num+1)%MaxIF]).
+
+QUEUE=(enterarrq[num:IF]->QUEUE[num]),
+QUEUE[n0:IF]=(enterarrq[num:IF]->QUEUE[n0][num]
+	|cpu.serve[n0]->QUEUE),
+
+QUEUE[n0:IF][n1:IF]=(
+	enterarrq[num:IF]->QUEUE[n0][n1][num]
+	|cpu.serve[n0]->QUEUE[n1]),
+
+QUEUE[n0:IF][n1:IF][n2:IF]=(
+	enterarrq[num:IF]->QUEUE[n0][n1][n2][num]
+	|cpu.serve[n0]->QUEUE[n1][n2]),
+
+QUEUE[n0:IF][n1:IF][n2:IF][n3:IF]=(
+	enterarrq[num:IF]->QUEUE[n0][n1][n2][n3][num]
+	|cpu.serve[n0]->QUEUE[n1][n2][n3]),
+
+QUEUE[n0:IF][n1:IF][n2:IF][n3:IF][n4:IF]=(
+	enterarrq[num:IF]->QUEUE[n0][n1][n2][n3][n4][num]
+	|cpu.serve[n0]->QUEUE[n1][n2][n3][n4]),
+
+QUEUE[n0:IF][n1:IF][n2:IF][n3:IF][n4:IF][n5:IF]=(
+	cpu.serve[n0]->QUEUE[n1][n2][n3][n4][n5]).
+CPU = CPU[0],
+CPU[t:CPUT] = (when (t==0) serve[c:IF] -> quantums[i:CPUT] ->CPU[i]
+			|	when (t!=0) tick-> CPU[t-1]).
+
+||RR_SCHEDULER=(cpu:CPU|| GENERATOR || QUEUE).
