@@ -29,7 +29,7 @@ QUEUE[n0:IF][n1:IF][n2:IF][n3:IF][n4:IF]=(
 QUEUE[n0:IF][n1:IF][n2:IF][n3:IF][n4:IF][n5:IF]=(
 	cpu.serve[n0]->QUEUE[n1][n2][n3][n4][n5]).
 CPU = CPU[0],
-CPU[t:CPUT] = (when (t==0) serve[c:IF] -> quantums[i:CPUT] ->CPU[i]
+CPU[t:CPUT] = (when (t==0) serve[c:IF] -> quantums[i:1..MaxCPU] ->CPU[i]
 			|	when (t!=0) tick-> CPU[t-1]).
 
 ||RR_SCHEDULER=(cpu:CPU|| GENERATOR || QUEUE).
